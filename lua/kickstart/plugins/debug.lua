@@ -84,6 +84,12 @@ return {
     dap.listeners.before.event_terminated['dapui_config'] = dapui.close
     dap.listeners.before.event_exited['dapui_config'] = dapui.close
 
+    require('dap-vscode-js').setup {
+      node_path = '/home/jon/.nvm/versions/node/v20.12.2/bin/node', -- Path to your Node.js executable (optional)
+      debugger_path = vim.fn.stdpath 'data' .. '/mason/packages/js-debug-adapter',
+      adapters = { 'pwa-node', 'pwa-chrome', 'pwa-msedge', 'node-terminal', 'pwa-extensionHost' }, -- Adjust as needed
+    }
+
     -- Install golang specific config
     require('dap-go').setup()
   end,
