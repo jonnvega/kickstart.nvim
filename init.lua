@@ -68,6 +68,12 @@ vim.opt.cursorline = true
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 10
 
+-- Scroll up 5 lines with Shift+Up
+vim.keymap.set('n', '<S-Up>', '5k', { desc = 'Scroll up 5 lines' })
+
+-- Scroll down 5 lines with Shift+Down
+vim.keymap.set('n', '<S-Down>', '5j', { desc = 'Scroll down 5 lines' })
+
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
 
