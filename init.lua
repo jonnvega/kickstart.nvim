@@ -495,7 +495,39 @@ require('lazy').setup({
         --    https://github.com/pmizio/typescript-tools.nvim
         --
         -- But for many setups, the LSP (`tsserver`) will work just fine
-        tsserver = {},
+        tsserver = {
+          -- Specific settings for handling js and ts files
+          init_options = {
+            preferences = {
+              importModuleSpecifierPreference = 'relative',
+              quotePreference = 'single',
+              providePrefixAndSuffixTextForRename = false,
+              allowTextChangesInNewFiles = true,
+            },
+          },
+          settings = {
+            javascript = {
+              format = {
+                enable = true,
+              },
+              suggest = {
+                autoImports = true,
+              },
+            },
+            typescript = {
+              format = {
+                enable = true,
+              },
+              suggest = {
+                autoImports = true,
+              },
+            },
+          },
+          on_attach = function(client, bufnr)
+            -- Custom on_attach functions, if needed
+          end,
+        },
+        clojure_lsp = {},
         --
         lua_ls = {
           -- cmd = {...},
@@ -757,7 +789,7 @@ require('lazy').setup({
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
     opts = {
-      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc' },
+      ensure_installed = { 'bash', 'c', 'html', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc', 'typescript', 'javascript', 'clojure' },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
@@ -786,11 +818,53 @@ require('lazy').setup({
     end,
   },
 
+  {
+    'Olical/conjure',
+    ft = { 'clojure', 'fennel', 'janet', 'racket', 'scheme' },
+    config = function()
+      -- Disable Conjure's default mappings by setting the prefix to `nil`
+      vim.g['conjure#mapping#prefix'] = ''
+
+      -- Evaluation Commands
+      vim.api.nvim_set_keymap('n', '<C-c>ee', '<cmd>ConjureEval<CR>', { noremap = true, silent = true }) -- Evaluate current form
+      vim.api.nvim_set_keymap('n', '<C-c>er', '<cmd>ConjureEvalRootForm<CR>', { noremap = true, silent = true }) -- Evaluate root form
+      vim.api.nvim_set_keymap('n', '<C-c>eb', '<cmd>ConjureEvalBuf<CR>', { noremap = true, silent = true }) -- Evaluate entire buffer
+      vim.api.nvim_set_keymap('n', '<C-c>ew', '<cmd>ConjureEvalWord<CR>', { noremap = true, silent = true }) -- Evaluate the word under the cursor
+      vim.api.nvim_set_keymap('n', '<C-c>ef', '<cmd>ConjureEvalFile<CR>', { noremap = true, silent = true }) -- Evaluate the current file
+      vim.api.nvim_set_keymap('n', '<C-c>ec', '<cmd>ConjureEvalCurrentForm<CR>', { noremap = true, silent = true }) -- Evaluate the current form (like `ee`)
+      vim.api.nvim_set_keymap('n', '<C-c>ep', '<cmd>ConjureEvalPrevForm<CR>', { noremap = true, silent = true }) -- Evaluate previous form
+      vim.api.nvim_set_keymap('n', '<C-c>el', '<cmd>ConjureEvalLast<CR>', { noremap = true, silent = true }) -- Evaluate the last form
+      vim.api.nvim_set_keymap('n', '<C-c>es', '<cmd>ConjureEvalSelection<CR>', { noremap = true, silent = true }) -- Evaluate current selection
+
+      -- Result Navigation Commands
+      vim.api.nvim_set_keymap('n', '<C-c>rr', '<cmd>ConjureLogJumpToLatest<CR>', { noremap = true, silent = true }) -- Jump to the latest result
+      vim.api.nvim_set_keymap('n', '<C-c>rp', '<cmd>ConjureLogPrev<CR>', { noremap = true, silent = true }) -- Go to the previous result
+      vim.api.nvim_set_keymap('n', '<C-c>rn', '<cmd>ConjureLogNext<CR>', { noremap = true, silent = true }) -- Go to the next result
+
+      -- Connection and REPL Commands
+      vim.api.nvim_set_keymap('n', '<C-c>cc', '<cmd>ConjureConnect<CR>', { noremap = true, silent = true }) -- Connect to a REPL
+      vim.api.nvim_set_keymap('n', '<C-c>cs', '<cmd>ConjureClientState<CR>', { noremap = true, silent = true }) -- Show REPL connection state
+      vim.api.nvim_set_keymap('n', '<C-c>cd', '<cmd>ConjureDisconnect<CR>', { noremap = true, silent = true }) -- Disconnect from REPL
+      vim.api.nvim_set_keymap('n', '<C-c>cr', '<cmd>ConjureReplRestart<CR>', { noremap = true, silent = true }) -- Restart REPL
+
+      -- Documentation Commands
+      vim.api.nvim_set_keymap('n', '<C-c>hd', '<cmd>ConjureDocWord<CR>', { noremap = true, silent = true }) -- Show documentation for the word under cursor
+      vim.api.nvim_set_keymap('n', '<C-c>hf', '<cmd>ConjureDocForm<CR>', { noremap = true, silent = true }) -- Show documentation for the current form
+
+      -- Interrupt Command
+      vim.api.nvim_set_keymap('n', '<C-c>ii', '<cmd>ConjureInterrupt<CR>', { noremap = true, silent = true }) -- Interrupt any running evaluation
+    end,
+  },
   -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
   -- place them in the correct locations.
 
   -- NOTE: Next step on your Neovim journey: Add/Configure additional plugins for Kickstart
+  --
+  {
+    'mfussenegger/nvim-dap',
+    'rcarriga/nvim-dap-ui',
+  },
   --
   --  Here are some example plugins that I've included in the Kickstart repository.
   --  Uncomment any of the lines below to enable them (you will need to restart nvim).
