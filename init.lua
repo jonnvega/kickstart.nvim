@@ -84,8 +84,20 @@ vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 -- Diagnostic keymaps
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous [D]iagnostic message' })
 vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next [D]iagnostic message' })
-vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Show diagnostic [E]rror messages' })
+--vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Show diagnostic [E]rror messages' })
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
+
+-- Open netrw
+vim.keymap.set('n', '<leader>e', ':Lexplore<CR>', { desc = '[E]xplore files (netrw)' })
+
+-- Open netrw in the current file's directory
+vim.keymap.set('n', '<leader>ee', ':Lexplore %:p:h<CR>', { desc = '[E]xplore current file directory' })
+
+-- Open init.lua in a new tab
+vim.keymap.set('n', '<leader>vi', ':tabedit $MYVIMRC<CR>', { desc = '[V]iew [I]nit.lua' })
+
+-- Reload init.lua after editing
+vim.keymap.set('n', '<leader>vr', ':source $MYVIMRC<CR>', { desc = '[V]im [R]eload config' })
 
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
@@ -502,6 +514,8 @@ require('lazy').setup({
         --
         -- But for many setups, the LSP (`tsserver`) will work just fine
         ts_ls = {},
+
+        clojure_lsp = {},
         --
         lua_ls = {
           -- cmd = {...},
