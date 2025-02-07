@@ -5,7 +5,7 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = false
+vim.g.have_nerd_font = true
 
 -- [[ Setting options ]]
 -- See `:help vim.opt`
@@ -68,6 +68,12 @@ vim.opt.cursorline = true
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 10
 
+-- Scroll up 5 lines with Shift+Up
+vim.keymap.set('n', '<S-Up>', '5k', { desc = 'Scroll up 5 lines' })
+
+-- Scroll down 5 lines with Shift+Down
+vim.keymap.set('n', '<S-Down>', '5j', { desc = 'Scroll down 5 lines' })
+
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
 
@@ -78,8 +84,20 @@ vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 -- Diagnostic keymaps
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous [D]iagnostic message' })
 vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next [D]iagnostic message' })
-vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Show diagnostic [E]rror messages' })
+--vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Show diagnostic [E]rror messages' })
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
+
+-- Open netrw
+vim.keymap.set('n', '<leader>e', ':Lexplore<CR>', { desc = '[E]xplore files (netrw)' })
+
+-- Open netrw in the current file's directory
+vim.keymap.set('n', '<leader>ee', ':Lexplore %:p:h<CR>', { desc = '[E]xplore current file directory' })
+
+-- Open init.lua in a new tab
+vim.keymap.set('n', '<leader>vi', ':e $MYVIMRC<CR>', { desc = '[V]iew [I]nit.lua' })
+
+-- Reload init.lua after editing
+vim.keymap.set('n', '<leader>vr', ':source $MYVIMRC<CR>', { desc = '[V]im [R]eload config' })
 
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
@@ -190,9 +208,31 @@ require('lazy').setup({
   {
     'windwp/nvim-autopairs',
     event = 'InsertEnter',
-    config = true,
-  },
+    config = function()
+      local npairs = require 'nvim-autopairs'
+      npairs.setup {
+        check_ts = true,
+        fast_wrap = {},
+        map_cr = true,
+        disable_filetype = { 'TelescopePrompt', 'vim' },
+      }
 
+      -- Optional: Use `cmp` integration if you're using `nvim-cmp` for autocompletion
+      local cmp_autopairs = require 'nvim-autopairs.completion.cmp'
+      local cmp = require 'cmp'
+      cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done())
+
+      -- Behavior customization
+      local Rule = require 'nvim-autopairs.rule'
+
+      -- Rule for ignoring additional pairs if closing character is typed
+      npairs.add_rules {
+        Rule('(', ')'):with_pair(function(opts)
+          return opts.line:sub(opts.col - 1, opts.col) ~= '()'
+        end),
+      }
+    end,
+  },
   { -- Useful plugin to show you pending keybinds.
     'folke/which-key.nvim',
     event = 'VimEnter', -- Sets the loading event to 'VimEnter'
@@ -495,38 +535,8 @@ require('lazy').setup({
         --    https://github.com/pmizio/typescript-tools.nvim
         --
         -- But for many setups, the LSP (`tsserver`) will work just fine
-        tsserver = {
-          -- Specific settings for handling js and ts files
-          init_options = {
-            preferences = {
-              importModuleSpecifierPreference = 'relative',
-              quotePreference = 'single',
-              providePrefixAndSuffixTextForRename = false,
-              allowTextChangesInNewFiles = true,
-            },
-          },
-          settings = {
-            javascript = {
-              format = {
-                enable = true,
-              },
-              suggest = {
-                autoImports = true,
-              },
-            },
-            typescript = {
-              format = {
-                enable = true,
-              },
-              suggest = {
-                autoImports = true,
-              },
-            },
-          },
-          on_attach = function(client, bufnr)
-            -- Custom on_attach functions, if needed
-          end,
-        },
+        ts_ls = {},
+
         clojure_lsp = {},
         --
         lua_ls = {
@@ -543,6 +553,7 @@ require('lazy').setup({
             },
           },
         },
+        sqlls = {},
       }
 
       -- Ensure the servers and tools above are installed
@@ -594,7 +605,7 @@ require('lazy').setup({
     },
     opts = {
       notify_on_error = false,
-      format_on_save = function(bufnr)
+      --[[ format_on_save = function(bufnr)
         -- Disable "format_on_save lsp_fallback" for languages that don't
         -- have a well standardized coding style. You can add additional
         -- languages here or re-enable it for the disabled ones.
@@ -603,7 +614,7 @@ require('lazy').setup({
           timeout_ms = 500,
           lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
         }
-      end,
+      end, ]]
       formatters_by_ft = {
         lua = { 'stylua' },
         -- Conform can also run multiple formatters sequentially
@@ -789,7 +800,7 @@ require('lazy').setup({
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
     opts = {
-      ensure_installed = { 'bash', 'c', 'html', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc', 'typescript', 'javascript', 'clojure' },
+      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc', 'javascript', 'clojure', 'sql', 'json'},
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
@@ -817,7 +828,6 @@ require('lazy').setup({
       --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
     end,
   },
-
   {
     'Olical/conjure',
     ft = { 'clojure', 'fennel', 'janet', 'racket', 'scheme' },
@@ -853,18 +863,16 @@ require('lazy').setup({
 
       -- Interrupt Command
       vim.api.nvim_set_keymap('n', '<C-c>ii', '<cmd>ConjureInterrupt<CR>', { noremap = true, silent = true }) -- Interrupt any running evaluation
+
+      vim.api.nvim_set_keymap('n', '<S-CR>', '<cmd>ConjureEvalCurrentForm<CR>', { noremap = true, silent = true })
     end,
   },
+
   -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
   -- place them in the correct locations.
 
   -- NOTE: Next step on your Neovim journey: Add/Configure additional plugins for Kickstart
-  --
-  {
-    'mfussenegger/nvim-dap',
-    'rcarriga/nvim-dap-ui',
-  },
   --
   --  Here are some example plugins that I've included in the Kickstart repository.
   --  Uncomment any of the lines below to enable them (you will need to restart nvim).
