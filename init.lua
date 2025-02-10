@@ -68,6 +68,11 @@ vim.opt.cursorline = true
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 10
 
+vim.opt.foldmethod = "expr"
+vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
+vim.opt.foldenable = true -- Enable folding by default
+vim.opt.foldlevel = 99 -- Start with everything unfolded
+
 -- Scroll up 5 lines with Shift+Up
 vim.keymap.set('n', '<S-Up>', '5k', { desc = 'Scroll up 5 lines' })
 
@@ -800,7 +805,7 @@ require('lazy').setup({
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
     opts = {
-      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc', 'javascript', 'clojure', 'sql', 'json'},
+      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc', 'javascript', 'clojure', 'sql', ''},
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
@@ -811,6 +816,7 @@ require('lazy').setup({
         additional_vim_regex_highlighting = { 'ruby' },
       },
       indent = { enable = true, disable = { 'ruby' } },
+      fold = { enable = true }
     },
     config = function(_, opts)
       -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
