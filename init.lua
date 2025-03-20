@@ -68,8 +68,8 @@ vim.opt.cursorline = true
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 10
 
-vim.opt.foldmethod = "expr"
-vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
+vim.opt.foldmethod = 'expr'
+vim.opt.foldexpr = 'nvim_treesitter#foldexpr()'
 vim.opt.foldenable = true -- Enable folding by default
 vim.opt.foldlevel = 99 -- Start with everything unfolded
 
@@ -93,10 +93,10 @@ vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next [D]iagn
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 
 -- Open netrw
-vim.keymap.set('n', '<leader>e', ':Lexplore<CR>', { desc = '[E]xplore files (netrw)' })
-
--- Open netrw in the current file's directory
-vim.keymap.set('n', '<leader>ee', ':Lexplore %:p:h<CR>', { desc = '[E]xplore current file directory' })
+-- vim.keymap.set('n', '<leader>e', ':Lexplore<CR>', { desc = '[E]xplore files (netrw)' })
+--
+-- -- Open netrw in the current file's directory
+-- vim.keymap.set('n', '<leader>ee', ':Lexplore %:p:h<CR>', { desc = '[E]xplore current file directory' })
 
 -- Open init.lua in a new tab
 vim.keymap.set('n', '<leader>vi', ':e $MYVIMRC<CR>', { desc = '[V]iew [I]nit.lua' })
@@ -173,6 +173,28 @@ require('lazy').setup({
   --
   --  This is equivalent to:
   --    require('Comment').setup({})
+  {
+    'nvim-tree/nvim-tree.lua',
+    dependencies = {
+      'nvim-tree/nvim-web-devicons',
+    },
+    keys = {
+      { '<leader>e', '<cmd>NvimTreeToggle<CR>', desc = 'Toggle NvimTree' },
+      { '<leader>ee', '<cmd>NvimTreeFindFile<CR>', desc = 'Locate current file in NvimTree' },
+    },
+    opts = {
+      update_focused_file = {
+        enable = true,
+        update_cwd = true,
+      },
+      view = {
+        width = 30,
+      },
+      git = {
+        enable = true,
+      },
+    },
+  },
 
   -- "gc" to comment visual regions/lines
   { 'numToStr/Comment.nvim', opts = {} },
@@ -805,7 +827,7 @@ require('lazy').setup({
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
     opts = {
-      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc', 'javascript', 'clojure', 'sql', ''},
+      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc', 'javascript', 'clojure', 'sql' },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
@@ -816,7 +838,7 @@ require('lazy').setup({
         additional_vim_regex_highlighting = { 'ruby' },
       },
       indent = { enable = true, disable = { 'ruby' } },
-      fold = { enable = true }
+      fold = { enable = true },
     },
     config = function(_, opts)
       -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
